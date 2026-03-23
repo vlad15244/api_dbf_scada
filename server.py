@@ -32,7 +32,7 @@ def get_list():
 def get_new():
     id_new = request.get_json()['ID']
     name_new = request.get_json()['VALUE']
-    print(float(id_new))   
+  
 
     with dbf.Table('example.dbf') as some_table:
         some_table.open(dbf.READ_WRITE)
@@ -42,7 +42,27 @@ def get_new():
         'id': id_new,
         'name' : name_new,
         'status': 'NEW'
-    }), 201    
+    }), 201   
+
+@app.route('/scada/update/<id>', methods=['POST'])
+def get_update():
+    id_new = request.get_json()['ID']
+    name_new = request.get_json()['VALUE']
+ 
+    with dbf.Table('example.dbf') as some_table:
+        for record in some_table:
+            if record.id == id_new:
+                dbf.replace(record, name = name_new)
+                break
+
+    some_table.close()
+
+
+    return jsonify({
+        'id': id_new,
+        'name' : name_new,
+        'status': 'EDIT'
+    }), 201 
 
 
 if __name__ == '__main__':
