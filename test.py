@@ -57,6 +57,31 @@ def test_list_of_two_string(client, mock_dbf_table, mocker):
         assert data['response']['2']['VALUE'] == 'Value2', "Значение Value '2' отсутствует в response или некорректно"                
     else:
         raise ValueError("Неизвестный тип response")
+    
+def test_insert_new(client, mock_dbf_table, mocker):
+
+    #проверяем запись в базу
+    mock_table_class = mocker.patch('dbf.Table')
+    mock_table = mocker.MagicMock()
+    mock_table_class.return_value = mock_table
+    mock_table.__enter__.return_value = mock_table
+    mock_table.__exit__.return_value = None
+    mock_table.record_count = 0
+
+    test_data = {'ID' : 5, 'VALUE' : 'NEW_VALUE'}
+    response = client.post('/scada/new/', json=test_data)
+    assert response.status_code == 201, "Неверный код ответа"
+    data = response.json
+    assert data['id'] == 5, "Неверный ответ"
+    assert data['name'] == 'NEW_VALUE', "Неверный ответ" 
+    mock_table.append.assert_called_once_with({'ID': 5, 'VALUE': 'NEW_VALUE'})
+
+
+
+    
+
+
+
 
 
 
