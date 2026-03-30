@@ -4,6 +4,10 @@ import dbf
 app = Flask(__name__)
 
 
+@app.route('/')
+def get_ping():
+    return 'Pong', 200
+
 @app.route('/scada/list/', methods=['GET'])
 def get_list():
     """получение всех список из базы данных"""
