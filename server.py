@@ -67,6 +67,22 @@ def get_update(id):
         'status': 'EDIT'
     }), 201 
 
+@app.route('/scada/delete/<id>', methods=['POST'])
+def get_delete(id):
+
+    table = dbf.Table('example.dbf')
+    table.open(mode=dbf.READ_WRITE)
+
+    for record in dbf.Process(table):
+        if str(record.id) == str(float(id)):
+            dbf.delete(record)
+    table.pack() 
+    table.close()       
+    return jsonify({
+        'id': id,
+        'status': 'DELETE'
+    }), 201 
+
 
 if __name__ == '__main__':
     app.run(host='localhost', port=5000, debug=True)
