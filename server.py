@@ -4,6 +4,14 @@ import dbf
 app = Flask(__name__)
 
 
+class NameFieldError(Exception):
+    """Исключение, когда поля не соотвествуют"""
+    pass
+
+class VoidFieldError(Exception):
+    """Исключение, когда поле пустое"""
+    pass
+
 @app.route('/')
 def get_ping():
     return 'Pong', 200
@@ -36,6 +44,14 @@ def get_list():
 def get_new():
 
     data = request.get_json()
+    """ добавим валидацию данных """
+
+    if not "ID" in data:
+        raise NameFieldError(f"Обязательное поле ID отсутсвует")
+
+    if not "VALUE" in data:
+        raise NameFieldError(f"Обязательное поле VALUE отсутсвует") 
+          
     id_new = data['ID']
     name_new = data['VALUE']
   
@@ -52,7 +68,14 @@ def get_new():
 @app.route('/scada/update/<id>', methods=['POST'])
 def get_update(id):
 
+    if not "VALUE" in  request.get_json():
+        raise NameFieldError(f"Обязательное поле VALUE отсутсвует")     
+    
     name_new = request.get_json()['VALUE']
+
+    if name_new == "":
+        raise VoidFieldError(f"Пустое поле")        
+
 
     table = dbf.Table('example.dbf')
     table.open(mode=dbf.READ_WRITE)
